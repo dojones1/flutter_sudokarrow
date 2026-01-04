@@ -17,7 +17,7 @@ class SudokuCell {
     : candidates = candidates ?? [];
 
   void setValue(int value) {
-    if (isFixed) return;  // Fixed cells cannot be changed.
+    if (isFixed) return; // Fixed cells cannot be changed.
     this.value = value;
   }
 
