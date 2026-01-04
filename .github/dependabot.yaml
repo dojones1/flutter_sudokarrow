@@ -1,0 +1,6 @@
+version: 2
+updates:
+  - package-ecosystem: "pub" # Specifies the Dart/Flutter package manager
+    directory: "/"           # Location of your pubspec.yaml file
+    schedule:
+      interval: "daily"
