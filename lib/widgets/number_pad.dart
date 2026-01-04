@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/game_state.dart';
 
 class NumberPad extends StatelessWidget {
-  const NumberPad({Key? key}) : super(key: key);
+  const NumberPad({super.key});
 
   @override
   Widget build(BuildContext context) {

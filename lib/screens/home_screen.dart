@@ -7,7 +7,7 @@ import '../services/file_storage_service.dart';
 import 'game_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -44,14 +44,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        _startNewGame(context, authorMode: false);
+                        _startNewGame(authorMode: false);
                       },
                       child: const Text('Play New Game (Empty)'),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        _startNewGame(context, authorMode: true);
+                        _startNewGame(authorMode: true);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           title: Text('Puzzle: $id'),
                           trailing: IconButton(
                             icon: const Icon(Icons.play_arrow),
-                            onPressed: () => _loadGame(context, id),
+                            onPressed: () => _loadGame(id),
                           ),
                         );
                       },
@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _startNewGame(BuildContext context, {required bool authorMode}) async {
+  void _startNewGame({required bool authorMode}) async {
     final puzzle = Puzzle(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: authorMode ? 'New Puzzle' : 'Play Mode',
@@ -122,10 +122,11 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
       MaterialPageRoute(builder: (context) => const GameScreen()),
     );
+    if (!mounted) return;
     _refreshList(); // Refresh list on return
   }
 
-  void _loadGame(BuildContext context, String id) async {
+  void _loadGame(String id) async {
     final puzzle = await _storageService.loadPuzzle(id);
     if (puzzle != null && mounted) {
       context.read<GameState>().startGame(puzzle, authorMode: false);
@@ -133,6 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         MaterialPageRoute(builder: (context) => const GameScreen()),
       );
+      if (!mounted) return;
       _refreshList();
     }
   }

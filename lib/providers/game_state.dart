@@ -42,8 +42,11 @@ class GameState extends ChangeNotifier {
   }
 
   void numberInput(int number) {
-    if (_currentPuzzle == null || _selectedRow == null || _selectedCol == null)
+    if (_currentPuzzle == null ||
+        _selectedRow == null ||
+        _selectedCol == null) {
       return;
+    }
 
     final cell = _currentPuzzle!.grid.getCell(_selectedRow!, _selectedCol!);
 
@@ -54,7 +57,9 @@ class GameState extends ChangeNotifier {
       cell.candidates.clear();
     } else {
       // In play mode
-      if (cell.isFixed) return;
+      if (cell.isFixed) {
+        return;
+      }
 
       if (_inputMode == InputMode.value) {
         if (cell.value == number) {
@@ -75,15 +80,20 @@ class GameState extends ChangeNotifier {
   }
 
   void clearCell() {
-    if (_currentPuzzle == null || _selectedRow == null || _selectedCol == null)
+    if (_currentPuzzle == null ||
+        _selectedRow == null ||
+        _selectedCol == null) {
       return;
+    }
     final cell = _currentPuzzle!.grid.getCell(_selectedRow!, _selectedCol!);
 
     if (_authorMode) {
       cell.value = null;
       cell.isFixed = false;
     } else {
-      if (cell.isFixed) return;
+      if (cell.isFixed) {
+        return;
+      }
       cell.value = null;
       cell.candidates.clear();
     }

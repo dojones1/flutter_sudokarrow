@@ -6,12 +6,13 @@ import '../widgets/number_pad.dart';
 import '../services/file_storage_service.dart';
 
 class GameScreen extends StatelessWidget {
-  const GameScreen({Key? key}) : super(key: key);
+  const GameScreen({super.key});
 
   void _saveGame(BuildContext context, GameState gameState) async {
     final service = FileStorageService();
     if (gameState.currentPuzzle != null) {
       await service.savePuzzle(gameState.currentPuzzle!);
+      if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Puzzle Saved!')));
