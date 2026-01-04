@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/sudoku_cell.dart';
 import '../providers/game_state.dart';
 
 class SudokuCellView extends StatelessWidget {
   final int row;
   final int col;
 
-  const SudokuCellView({Key? key, required this.row, required this.col})
-      : super(key: key);
+  const SudokuCellView({super.key, required this.row, required this.col});
 
   @override
   Widget build(BuildContext context) {
@@ -17,16 +15,17 @@ class SudokuCellView extends StatelessWidget {
         final cell = gameState.grid?.getCell(row, col);
         if (cell == null) return const SizedBox();
 
-        final isSelected = gameState.selectedRow == row && gameState.selectedCol == col;
+        final isSelected =
+            gameState.selectedRow == row && gameState.selectedCol == col;
         final isFixed = cell.isFixed;
         final hasValue = cell.value != null;
 
         // Visual properties
         Color bgColor = Colors.white;
         if (isSelected) {
-          bgColor = Colors.blue.withOpacity(0.3);
+          bgColor = Colors.blue.withValues(alpha: 0.3);
         } else if (isFixed) {
-          bgColor = Colors.grey.withOpacity(0.1);
+          bgColor = Colors.grey.withValues(alpha: 0.1);
         }
 
         return GestureDetector(
@@ -36,7 +35,7 @@ class SudokuCellView extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               color: bgColor,
-              border: Border.all(color: Colors.grey.withOpacity(0.5)),
+              border: Border.all(color: Colors.grey.withValues(alpha: 0.5)),
             ),
             child: Center(
               child: hasValue
@@ -44,7 +43,9 @@ class SudokuCellView extends StatelessWidget {
                       cell.value.toString(),
                       style: TextStyle(
                         fontSize: 24,
-                        fontWeight: isFixed ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isFixed
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                         color: isFixed ? Colors.black : Colors.blueAccent,
                       ),
                     )

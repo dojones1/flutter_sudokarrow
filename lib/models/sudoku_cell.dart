@@ -13,11 +13,13 @@ class SudokuCell {
   /// User-annotated possible values (candidates/notes).
   List<int> candidates;
 
-  SudokuCell({
-    this.value,
-    this.isFixed = false,
-    List<int>? candidates,
-  }) : candidates = candidates ?? [];
+  SudokuCell({this.value, this.isFixed = false, List<int>? candidates})
+    : candidates = candidates ?? [];
+
+  void setValue(int value) {
+    if (isFixed) return; // Fixed cells cannot be changed.
+    this.value = value;
+  }
 
   factory SudokuCell.fromJson(Map<String, dynamic> json) =>
       _$SudokuCellFromJson(json);

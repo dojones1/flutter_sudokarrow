@@ -7,7 +7,7 @@ import '../services/file_storage_service.dart';
 import 'game_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -41,56 +41,63 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
-                   children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          _startNewGame(context, authorMode: false);
-                        },
-                        child: const Text('Play New Game (Empty)'),
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        _startNewGame(authorMode: false);
+                      },
+                      child: const Text('Play New Game (Empty)'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        _startNewGame(authorMode: true);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
                       ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          _startNewGame(context, authorMode: true);
-                        },
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                        child: const Text('Create Puzzle (Author Mode)'),
-                      ),
-                   ]
+                      child: const Text('Create Puzzle (Author Mode)'),
+                    ),
+                  ],
                 ),
               ),
               const Divider(),
               const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text('Saved Puzzles', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Saved Puzzles',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
               Expanded(
                 child: FutureBuilder<List<String>>(
                   future: _puzzlesFuture,
                   builder: (context, snapshot) {
-                     if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                     }
-                     if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                     }
-                     final puzzles = snapshot.data ?? [];
-                     if (puzzles.isEmpty) {
-                        return const Center(child: Text('No saved puzzles found.'));
-                     }
-                     return ListView.builder(
-                        itemCount: puzzles.length,
-                        itemBuilder: (context, index) {
-                            final id = puzzles[index];
-                            return ListTile(
-                                title: Text('Puzzle: $id'),
-                                trailing: IconButton(
-                                   icon: const Icon(Icons.play_arrow),
-                                   onPressed: () => _loadGame(context, id),
-                                ),
-                            );
-                        },
-                     );
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+                    final puzzles = snapshot.data ?? [];
+                    if (puzzles.isEmpty) {
+                      return const Center(
+                        child: Text('No saved puzzles found.'),
+                      );
+                    }
+                    return ListView.builder(
+                      itemCount: puzzles.length,
+                      itemBuilder: (context, index) {
+                        final id = puzzles[index];
+                        return ListTile(
+                          title: Text('Puzzle: $id'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.play_arrow),
+                            onPressed: () => _loadGame(id),
+                          ),
+                        );
+                      },
+                    );
                   },
                 ),
               ),
@@ -101,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _startNewGame(BuildContext context, {required bool authorMode}) async {
+  void _startNewGame({required bool authorMode}) async {
     final puzzle = Puzzle(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: authorMode ? 'New Puzzle' : 'Play Mode',
@@ -115,18 +122,20 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
       MaterialPageRoute(builder: (context) => const GameScreen()),
     );
+    if (!mounted) return;
     _refreshList(); // Refresh list on return
   }
 
-  void _loadGame(BuildContext context, String id) async {
+  void _loadGame(String id) async {
     final puzzle = await _storageService.loadPuzzle(id);
     if (puzzle != null && mounted) {
-        context.read<GameState>().startGame(puzzle, authorMode: false);
-        await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const GameScreen()),
-        );
-        _refreshList();
+      context.read<GameState>().startGame(puzzle, authorMode: false);
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const GameScreen()),
+      );
+      if (!mounted) return;
+      _refreshList();
     }
   }
 }

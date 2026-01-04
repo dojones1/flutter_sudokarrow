@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import '../models/puzzle.dart';
@@ -31,7 +32,7 @@ class FileStorageService {
       final jsonMap = jsonDecode(jsonString);
       return Puzzle.fromJson(jsonMap);
     } catch (e) {
-      print('Error loading puzzle: $e');
+      developer.log('Error loading puzzle', error: e);
       return null;
     }
   }
@@ -40,7 +41,7 @@ class FileStorageService {
     final path = await _localPath();
     final puzzlesDir = Directory('$path/puzzles');
     if (!await puzzlesDir.exists()) return [];
-    
+
     final entities = await puzzlesDir.list().toList();
     return entities
         .whereType<File>()

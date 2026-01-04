@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_sudokarrow/models/sudoku_grid.dart';
-import 'package:flutter_sudokarrow/models/sudoku_cell.dart';
 
 void main() {
   group('SudokuGrid Logic', () {
@@ -28,15 +27,18 @@ void main() {
       final grid = SudokuGrid.empty();
       grid.setCell(0, 0, 5);
       // 1,1 is in the same 3x3 box as 0,0
-      expect(grid.isValidMove(1, 1, 5), false); 
+      expect(grid.isValidMove(1, 1, 5), false);
       // 0,3 is in a different box (the one to the right)
-      expect(grid.isValidMove(0, 3, 5), false); // Wait, this is same row check, effectively.
-      
+      expect(
+        grid.isValidMove(0, 3, 5),
+        false,
+      ); // Wait, this is same row check, effectively.
+
       // Let's test box specifically where row/col are different but box is same.
       // 0,0 is top-left box.
       // 1,1 is top-left box.
       // 2,2 is top-left box.
-      
+
       grid.setCell(0, 0, 1);
       expect(grid.isValidMove(1, 1, 1), false);
       expect(grid.isValidMove(2, 2, 1), false);

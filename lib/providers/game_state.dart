@@ -35,53 +35,67 @@ class GameState extends ChangeNotifier {
   }
 
   void toggleInputMode() {
-    _inputMode = _inputMode == InputMode.value ? InputMode.notes : InputMode.value;
+    _inputMode = _inputMode == InputMode.value
+        ? InputMode.notes
+        : InputMode.value;
     notifyListeners();
   }
 
   void numberInput(int number) {
-    if (_currentPuzzle == null || _selectedRow == null || _selectedCol == null) return;
-    
+    if (_currentPuzzle == null ||
+        _selectedRow == null ||
+        _selectedCol == null) {
+      return;
+    }
+
     final cell = _currentPuzzle!.grid.getCell(_selectedRow!, _selectedCol!);
 
     if (_authorMode) {
-        // In author mode, we set the value and make it fixed
-        cell.value = number;
-        cell.isFixed = true;
-        cell.candidates.clear();
+      // In author mode, we set the value and make it fixed
+      cell.value = number;
+      cell.isFixed = true;
+      cell.candidates.clear();
     } else {
-        // In play mode
-        if (cell.isFixed) return;
+      // In play mode
+      if (cell.isFixed) {
+        return;
+      }
 
-        if (_inputMode == InputMode.value) {
-            if (cell.value == number) {
-                cell.value = null; // Toggle off
-            } else {
-                cell.value = number;
-            }
+      if (_inputMode == InputMode.value) {
+        if (cell.value == number) {
+          cell.value = null; // Toggle off
         } else {
-            // Notes mode
-            if (cell.candidates.contains(number)) {
-                cell.candidates.remove(number);
-            } else {
-                cell.candidates.add(number);
-            }
+          cell.value = number;
         }
+      } else {
+        // Notes mode
+        if (cell.candidates.contains(number)) {
+          cell.candidates.remove(number);
+        } else {
+          cell.candidates.add(number);
+        }
+      }
     }
     notifyListeners();
   }
 
   void clearCell() {
-    if (_currentPuzzle == null || _selectedRow == null || _selectedCol == null) return;
+    if (_currentPuzzle == null ||
+        _selectedRow == null ||
+        _selectedCol == null) {
+      return;
+    }
     final cell = _currentPuzzle!.grid.getCell(_selectedRow!, _selectedCol!);
-    
+
     if (_authorMode) {
-        cell.value = null;
-        cell.isFixed = false;
+      cell.value = null;
+      cell.isFixed = false;
     } else {
-        if (cell.isFixed) return;
-        cell.value = null;
-        cell.candidates.clear();
+      if (cell.isFixed) {
+        return;
+      }
+      cell.value = null;
+      cell.candidates.clear();
     }
     notifyListeners();
   }

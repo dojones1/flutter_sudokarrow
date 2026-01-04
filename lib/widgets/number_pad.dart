@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/game_state.dart';
 
 class NumberPad extends StatelessWidget {
-  const NumberPad({Key? key}) : super(key: key);
+  const NumberPad({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +17,20 @@ class NumberPad extends StatelessWidget {
               children: [
                 ElevatedButton.icon(
                   onPressed: gameState.toggleInputMode,
-                  icon: Icon(gameState.inputMode == InputMode.notes ? Icons.edit : Icons.edit_off),
-                  label: Text(gameState.inputMode == InputMode.notes ? 'Notes: ON' : 'Notes: OFF'),
+                  icon: Icon(
+                    gameState.inputMode == InputMode.notes
+                        ? Icons.edit
+                        : Icons.edit_off,
+                  ),
+                  label: Text(
+                    gameState.inputMode == InputMode.notes
+                        ? 'Notes: ON'
+                        : 'Notes: OFF',
+                  ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: gameState.inputMode == InputMode.notes ? Colors.amber : null,
+                    backgroundColor: gameState.inputMode == InputMode.notes
+                        ? Colors.amber
+                        : null,
                   ),
                 ),
                 ElevatedButton.icon(
