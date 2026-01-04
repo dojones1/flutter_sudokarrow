@@ -40,7 +40,7 @@ class FileStorageService {
     final path = await _localPath();
     final puzzlesDir = Directory('$path/puzzles');
     if (!await puzzlesDir.exists()) return [];
-    
+
     final entities = await puzzlesDir.list().toList();
     return entities
         .whereType<File>()

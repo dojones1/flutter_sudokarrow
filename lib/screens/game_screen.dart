@@ -9,13 +9,13 @@ class GameScreen extends StatelessWidget {
   const GameScreen({Key? key}) : super(key: key);
 
   void _saveGame(BuildContext context, GameState gameState) async {
-      final service = FileStorageService();
-      if (gameState.currentPuzzle != null) {
-          await service.savePuzzle(gameState.currentPuzzle!);
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Puzzle Saved!')),
-          );
-      }
+    final service = FileStorageService();
+    if (gameState.currentPuzzle != null) {
+      await service.savePuzzle(gameState.currentPuzzle!);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Puzzle Saved!')));
+    }
   }
 
   @override
@@ -34,8 +34,8 @@ class GameScreen extends StatelessWidget {
                 return Row(
                   children: [
                     IconButton(
-                        icon: const Icon(Icons.save),
-                        onPressed: () => _saveGame(context, gameState),
+                      icon: const Icon(Icons.save),
+                      onPressed: () => _saveGame(context, gameState),
                     ),
                     const Chip(
                       label: Text('Author Mode'),
@@ -61,10 +61,7 @@ class GameScreen extends StatelessWidget {
                   child: SudokuGridView(),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: NumberPad(),
-              ),
+              const Padding(padding: EdgeInsets.all(16.0), child: NumberPad()),
               Consumer<GameState>(
                 builder: (context, gameState, child) {
                   if (gameState.isSolved && !gameState.authorMode) {
@@ -72,7 +69,11 @@ class GameScreen extends StatelessWidget {
                       padding: EdgeInsets.all(8.0),
                       child: Text(
                         'Solved! 🎉',
-                        style: TextStyle(fontSize: 32, color: Colors.green, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 32,
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     );
                   }

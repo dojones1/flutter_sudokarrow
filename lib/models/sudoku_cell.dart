@@ -13,11 +13,8 @@ class SudokuCell {
   /// User-annotated possible values (candidates/notes).
   List<int> candidates;
 
-  SudokuCell({
-    this.value,
-    this.isFixed = false,
-    List<int>? candidates,
-  }) : candidates = candidates ?? [];
+  SudokuCell({this.value, this.isFixed = false, List<int>? candidates})
+    : candidates = candidates ?? [];
 
   factory SudokuCell.fromJson(Map<String, dynamic> json) =>
       _$SudokuCellFromJson(json);

@@ -10,7 +10,8 @@ class SudokuGridView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<GameState>(
       builder: (context, gameState, child) {
-        if (gameState.grid == null) return const Center(child: CircularProgressIndicator());
+        if (gameState.grid == null)
+          return const Center(child: CircularProgressIndicator());
 
         return AspectRatio(
           aspectRatio: 1.0,
@@ -33,11 +34,15 @@ class SudokuGridView extends StatelessWidget {
                           decoration: BoxDecoration(
                             border: Border(
                               right: BorderSide(
-                                color: borderRight ? Colors.black : Colors.grey.withOpacity(0.5),
+                                color: borderRight
+                                    ? Colors.black
+                                    : Colors.grey.withOpacity(0.5),
                                 width: borderRight ? 2.0 : 0.5,
                               ),
                               bottom: BorderSide(
-                                color: borderBottom ? Colors.black : Colors.grey.withOpacity(0.5),
+                                color: borderBottom
+                                    ? Colors.black
+                                    : Colors.grey.withOpacity(0.5),
                                 width: borderBottom ? 2.0 : 0.5,
                               ),
                             ),

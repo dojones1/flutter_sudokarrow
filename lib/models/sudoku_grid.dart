@@ -5,7 +5,7 @@ part 'sudoku_grid.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class SudokuGrid {
-  // 9x9 grid, stored as a flat list of 81 cells for simplicity, 
+  // 9x9 grid, stored as a flat list of 81 cells for simplicity,
   // or a list of lists. A flat list is easier to serialize.
   // We'll use a list of lists for easier access: grid[row][col].
   // Wait, JSON serialization of nested lists is fine.
@@ -19,10 +19,7 @@ class SudokuGrid {
 
   factory SudokuGrid.empty() {
     return SudokuGrid(
-      rows: List.generate(
-        9,
-        (_) => List.generate(9, (_) => SudokuCell()),
-      ),
+      rows: List.generate(9, (_) => List.generate(9, (_) => SudokuCell())),
     );
   }
 
@@ -39,7 +36,7 @@ class SudokuGrid {
     if (rows[row][col].isFixed) return;
     rows[row][col].value = value;
   }
-  
+
   /// Check if the current value at [row, col] is valid with respect to the rest of the board.
   /// This checks if the value exists elsewhere in the same row, col, or box.
   bool isValidMove(int row, int col, int value) {
