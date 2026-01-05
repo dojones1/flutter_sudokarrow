@@ -151,10 +151,7 @@ void main() {
     );
     final decoration = container.decoration as BoxDecoration;
     // Blue tint for selection
-    expect(
-      decoration.color?.value,
-      equals(Colors.blue.withValues(alpha: 0.3).value),
-    );
+    expect(decoration.color, equals(Colors.blue.withValues(alpha: 0.3)));
   });
 
   testWidgets('tapping cell should select it', (tester) async {
