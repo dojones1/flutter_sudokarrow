@@ -23,6 +23,24 @@ class SudokuGrid {
     );
   }
 
+  factory SudokuGrid.fromFixedValues(List<List<int>> values) {
+    if (values.length != 9 || values.any((row) => row.length != 9)) {
+      throw ArgumentError('Values must be 9x9');
+    }
+    return SudokuGrid(
+      rows: List.generate(
+        9,
+        (r) => List.generate(9, (c) {
+          final val = values[r][c];
+          if (val != 0) {
+            return SudokuCell(value: val, isFixed: true);
+          }
+          return SudokuCell();
+        }),
+      ),
+    );
+  }
+
   factory SudokuGrid.fromJson(Map<String, dynamic> json) =>
       _$SudokuGridFromJson(json);
 

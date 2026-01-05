@@ -15,6 +15,20 @@ void main() {
       }
     });
 
+    test('fromFixedValues should create grid with set values', () {
+      final values = List.generate(9, (_) => List.filled(9, 0));
+      values[0][0] = 5;
+      values[8][8] = 9;
+
+      final grid = SudokuGrid.fromFixedValues(values);
+      expect(grid.getCell(0, 0).value, 5);
+      expect(grid.getCell(0, 0).isFixed, isTrue);
+      expect(grid.getCell(8, 8).value, 9);
+      expect(grid.getCell(8, 8).isFixed, isTrue);
+      expect(grid.getCell(1, 1).value, isNull);
+      expect(grid.getCell(1, 1).isFixed, isFalse);
+    });
+
     test('constructor should throw ArgumentError for invalid dimensions', () {
       expect(() => SudokuGrid(rows: []), throwsArgumentError); // Empty rows
       expect(

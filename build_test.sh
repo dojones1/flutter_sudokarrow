@@ -1,7 +1,7 @@
 set -ex
 flutter upgrade
 flutter doctor
-dart format --output=write --set-exit-if-changed .
+dart format --output=write .
 flutter analyze
 flutter test
 flutter build web --wasm

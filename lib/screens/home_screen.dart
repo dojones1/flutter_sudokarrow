@@ -4,6 +4,7 @@ import '../models/puzzle.dart';
 import '../models/sudoku_grid.dart';
 import '../providers/game_state.dart';
 import '../services/file_storage_service.dart';
+import '../data/predefined_puzzles.dart';
 import 'game_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -59,6 +60,29 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: const Text('Create Puzzle (Author Mode)'),
                     ),
                   ],
+                ),
+              ),
+              const Divider(),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'Classic Puzzles',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(
+                height: 150, // Fixed height for scrolling
+                child: ListView.builder(
+                  itemCount: defaultPuzzles.length,
+                  itemBuilder: (context, index) {
+                    final puzzle = defaultPuzzles[index];
+                    return ListTile(
+                      title: Text(puzzle.title),
+                      subtitle: Text(puzzle.description),
+                      onTap: () => _startPredefinedGame(puzzle),
+                      leading: const Icon(Icons.grid_on),
+                    );
+                  },
                 ),
               ),
               const Divider(),
@@ -163,5 +187,35 @@ class _HomeScreenState extends State<HomeScreen> {
       await _storageService.deletePuzzle(id);
       if (mounted) _refreshList();
     }
+  }
+
+  void _startPredefinedGame(Puzzle puzzle) async {
+    // We pass a copy or rely on game state to not mutate the global defaultPuzzles definitions permanently if we don't want to.
+    // GameState usually clones or uses the grid. To be safe, we could clone.
+    // However, SudokuGrid isn't immutable, and GameState might modify it.
+    // Let's create a fresh copy from the fixed values to ensure the "Template" remains clean.
+    // Actually, serializing/deserializing is a cheap way to clone deeply.
+    final freshPuzzle = Puzzle.fromJson(puzzle.toJson());
+    // Give it a unique ID so if they save it, it doesn't try to overwrite a "classic" id or something (though save mechanism uses id).
+    // If we keep the same ID, "saving" might imply updating their progress on that classic puzzle.
+    // Let's keep the ID. If they save, it will create a file with that ID.
+    // When they reload, they load from file.
+    // BUT: If they load from file, they get the saved version.
+    // If they click "Classic Puzzle 1" again, do they get a fresh one or the saved one?
+    // Current UI logic: "Classic Puzzles" list always loads *fresh* from `defaultPuzzles`.
+    // "Saved Puzzles" loads from file.
+    // If user wants to resume classic puzzle, they should look in "Saved".
+    // So, we treat clicking on Classic as "Start New Run of Classic".
+    // To avoid ID collision with a saved progress file (which would be weird if we didn't load it),
+    // maybe we should separate IDs or check if a save exists?
+    // For simplicity: We'll let them start fresh. If they save, it saves.
+    // If they want to resume, they go to Saved Puzzles logic.
+
+    context.read<GameState>().startGame(freshPuzzle, authorMode: false);
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const GameScreen()),
+    );
+    if (mounted) _refreshList();
   }
 }
