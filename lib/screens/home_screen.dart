@@ -91,9 +91,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         final id = puzzles[index];
                         return ListTile(
                           title: Text('Puzzle: $id'),
+                          onTap: () => _loadGame(id),
                           trailing: IconButton(
-                            icon: const Icon(Icons.play_arrow),
-                            onPressed: () => _loadGame(id),
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _confirmDelete(id),
                           ),
                         );
                       },
@@ -136,6 +137,31 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       if (!mounted) return;
       _refreshList();
+    }
+  }
+
+  Future<void> _confirmDelete(String id) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Puzzle'),
+        content: const Text('Are you sure you want to delete this puzzle?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _storageService.deletePuzzle(id);
+      if (mounted) _refreshList();
     }
   }
 }
