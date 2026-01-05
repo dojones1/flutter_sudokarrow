@@ -20,6 +20,13 @@ class SudokuCellView extends StatelessWidget {
         final isFixed = cell.isFixed;
         final hasValue = cell.value != null;
 
+        bool isValid = true;
+        if (hasValue && gameState.grid != null) {
+          // Check if setting the current value at this position is a valid move.
+          // Note: isValidMove checks if the value exists ELSEWHERE in row/col/box.
+          isValid = gameState.grid!.isValidMove(row, col, cell.value!);
+        }
+
         // Visual properties
         Color bgColor = Colors.white;
         if (isSelected) {
@@ -46,7 +53,9 @@ class SudokuCellView extends StatelessWidget {
                         fontWeight: isFixed
                             ? FontWeight.bold
                             : FontWeight.normal,
-                        color: isFixed ? Colors.black : Colors.blueAccent,
+                        color: !isValid
+                            ? Colors.red
+                            : (isFixed ? Colors.black : Colors.blueAccent),
                       ),
                     )
                   : _buildNotes(cell.candidates),
