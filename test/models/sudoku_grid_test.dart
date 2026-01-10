@@ -170,5 +170,91 @@ void main() {
       expect(revivedGrid.getCell(1, 1).value, 2);
       expect(revivedGrid.getCell(1, 1).isFixed, isTrue);
     });
+
+    test('getHint should return a valid hint for empty grid', () {
+      final grid = SudokuGrid.empty();
+      final hint = grid.getHint();
+      expect(hint, isNotNull);
+      expect(hint!['row'], isA<int>());
+      expect(hint['col'], isA<int>());
+      expect(hint['value'], isA<int>());
+      expect(hint['value'], inInclusiveRange(1, 9));
+      // Verify the hint is valid
+      expect(
+        grid.isValidMove(hint['row']!, hint['col']!, hint['value']!),
+        isTrue,
+      );
+    });
+
+    test('getHint should return null for solved grid', () {
+      final grid = SudokuGrid.empty();
+      // Populate with a solved grid
+      final solvedValues = [
+        [5, 3, 4, 6, 7, 8, 9, 1, 2],
+        [6, 7, 2, 1, 9, 5, 3, 4, 8],
+        [1, 9, 8, 3, 4, 2, 5, 6, 7],
+        [8, 5, 9, 7, 6, 1, 4, 2, 3],
+        [4, 2, 6, 8, 5, 3, 7, 9, 1],
+        [7, 1, 3, 9, 2, 4, 8, 5, 6],
+        [9, 6, 1, 5, 3, 7, 2, 8, 4],
+        [2, 8, 7, 4, 1, 9, 6, 3, 5],
+        [3, 4, 5, 2, 8, 6, 1, 7, 9],
+      ];
+      for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < 9; c++) {
+          grid.rows[r][c].value = solvedValues[r][c];
+        }
+      }
+      expect(grid.getHint(), isNull);
+    });
+
+    test('autoPopulateNotes should populate candidates for empty grid', () {
+      final grid = SudokuGrid.empty();
+      grid.autoPopulateNotes();
+      for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < 9; c++) {
+          final cell = grid.getCell(r, c);
+          expect(cell.candidates, containsAll([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+        }
+      }
+    });
+
+    test('autoPopulateNotes should respect existing values', () {
+      final grid = SudokuGrid.empty();
+      grid.setCell(0, 0, 5);
+      grid.autoPopulateNotes();
+      // Cell (0,0) should have no candidates since it has value
+      expect(grid.getCell(0, 0).candidates, isEmpty);
+      // Other cells in row 0 should not have 5 as candidate
+      for (int c = 1; c < 9; c++) {
+        expect(grid.getCell(0, c).candidates, isNot(contains(5)));
+      }
+    });
+
+    test(
+      'updateCandidatesAfterPlacement should remove value from affected cells',
+      () {
+        final grid = SudokuGrid.empty();
+        // First populate notes
+        grid.autoPopulateNotes();
+        // Place 5 at (0,0)
+        grid.setCell(0, 0, 5);
+        grid.updateCandidatesAfterPlacement(0, 0, 5);
+        // Check row 0: no cell should have 5 as candidate
+        for (int c = 0; c < 9; c++) {
+          expect(grid.getCell(0, c).candidates, isNot(contains(5)));
+        }
+        // Check column 0: no cell should have 5 as candidate
+        for (int r = 0; r < 9; r++) {
+          expect(grid.getCell(r, 0).candidates, isNot(contains(5)));
+        }
+        // Check 3x3 box: cells in box should not have 5
+        for (int r = 0; r < 3; r++) {
+          for (int c = 0; c < 3; c++) {
+            expect(grid.getCell(r, c).candidates, isNot(contains(5)));
+          }
+        }
+      },
+    );
   });
 }

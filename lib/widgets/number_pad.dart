@@ -43,7 +43,7 @@ class NumberPad extends StatelessWidget {
             const SizedBox(height: 16),
             // numbers 1-9
             Wrap(
-              spacing: 8.0,
+              spacing: 45.0,
               runSpacing: 8.0,
               alignment: WrapAlignment.center,
               children: List.generate(9, (index) {

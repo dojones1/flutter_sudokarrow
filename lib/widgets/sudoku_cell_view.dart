@@ -19,6 +19,8 @@ class SudokuCellView extends StatelessWidget {
             gameState.selectedRow == row && gameState.selectedCol == col;
         final isFixed = cell.isFixed;
         final hasValue = cell.value != null;
+        final isHinted =
+            gameState.hintedRow == row && gameState.hintedCol == col;
 
         bool isValid = true;
         if (hasValue && gameState.grid != null) {
@@ -31,6 +33,10 @@ class SudokuCellView extends StatelessWidget {
         Color bgColor = Colors.white;
         if (isSelected) {
           bgColor = Colors.blue.withValues(alpha: 0.3);
+        } else if (isHinted) {
+          bgColor = Colors.yellow.withValues(alpha: 0.3);
+        } else if (!hasValue && cell.candidates.length == 1) {
+          bgColor = Colors.lightGreen.withValues(alpha: 0.3);
         } else if (isFixed) {
           bgColor = Colors.grey.withValues(alpha: 0.1);
         }
@@ -58,7 +64,16 @@ class SudokuCellView extends StatelessWidget {
                             : (isFixed ? Colors.black : Colors.blueAccent),
                       ),
                     )
-                  : _buildNotes(cell.candidates),
+                  : (isHinted && gameState.hintedValue != null
+                        ? Text(
+                            gameState.hintedValue.toString(),
+                            style: const TextStyle(
+                              fontSize: 24,
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          )
+                        : _buildNotes(cell.candidates)),
             ),
           ),
         );
