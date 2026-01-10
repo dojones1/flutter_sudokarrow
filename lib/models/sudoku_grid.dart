@@ -99,23 +99,6 @@ class SudokuGrid {
     return true;
   }
 
-  /// Get a hint: find the first empty cell and a valid value for it.
-  /// Returns a map with 'row', 'col', 'value' or null if no hint available.
-  Map<String, int>? getHint() {
-    for (int r = 0; r < 9; r++) {
-      for (int c = 0; c < 9; c++) {
-        if (rows[r][c].value == null) {
-          for (int val = 1; val <= 9; val++) {
-            if (isValidMove(r, c, val)) {
-              return {'row': r, 'col': c, 'value': val};
-            }
-          }
-        }
-      }
-    }
-    return null; // No empty cells or no valid moves
-  }
-
   /// Auto-populate notes (candidates) for all empty cells based on current board state.
   void autoPopulateNotes() {
     for (int r = 0; r < 9; r++) {
@@ -154,6 +137,44 @@ class SudokuGrid {
       for (int c = boxStartCol; c < boxStartCol + 3; c++) {
         if (r != row || c != col) {
           rows[r][c].candidates.remove(value);
+        }
+      }
+    }
+  }
+
+  /// Update candidates after removing a value: add back the value to candidates in the same row, column, and box where valid.
+  void updateCandidatesAfterRemoval(int row, int col, int value) {
+    // Add to row
+    for (int c = 0; c < 9; c++) {
+      if (c != col &&
+          rows[row][c].value == null &&
+          !rows[row][c].candidates.contains(value)) {
+        if (isValidMove(row, c, value)) {
+          rows[row][c].candidates.add(value);
+        }
+      }
+    }
+    // Add to column
+    for (int r = 0; r < 9; r++) {
+      if (r != row &&
+          rows[r][col].value == null &&
+          !rows[r][col].candidates.contains(value)) {
+        if (isValidMove(r, col, value)) {
+          rows[r][col].candidates.add(value);
+        }
+      }
+    }
+    // Add to 3x3 box
+    int boxStartRow = (row ~/ 3) * 3;
+    int boxStartCol = (col ~/ 3) * 3;
+    for (int r = boxStartRow; r < boxStartRow + 3; r++) {
+      for (int c = boxStartCol; c < boxStartCol + 3; c++) {
+        if ((r != row || c != col) &&
+            rows[r][c].value == null &&
+            !rows[r][c].candidates.contains(value)) {
+          if (isValidMove(r, c, value)) {
+            rows[r][c].candidates.add(value);
+          }
         }
       }
     }

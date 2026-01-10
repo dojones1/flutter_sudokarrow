@@ -171,43 +171,6 @@ void main() {
       expect(revivedGrid.getCell(1, 1).isFixed, isTrue);
     });
 
-    test('getHint should return a valid hint for empty grid', () {
-      final grid = SudokuGrid.empty();
-      final hint = grid.getHint();
-      expect(hint, isNotNull);
-      expect(hint!['row'], isA<int>());
-      expect(hint['col'], isA<int>());
-      expect(hint['value'], isA<int>());
-      expect(hint['value'], inInclusiveRange(1, 9));
-      // Verify the hint is valid
-      expect(
-        grid.isValidMove(hint['row']!, hint['col']!, hint['value']!),
-        isTrue,
-      );
-    });
-
-    test('getHint should return null for solved grid', () {
-      final grid = SudokuGrid.empty();
-      // Populate with a solved grid
-      final solvedValues = [
-        [5, 3, 4, 6, 7, 8, 9, 1, 2],
-        [6, 7, 2, 1, 9, 5, 3, 4, 8],
-        [1, 9, 8, 3, 4, 2, 5, 6, 7],
-        [8, 5, 9, 7, 6, 1, 4, 2, 3],
-        [4, 2, 6, 8, 5, 3, 7, 9, 1],
-        [7, 1, 3, 9, 2, 4, 8, 5, 6],
-        [9, 6, 1, 5, 3, 7, 2, 8, 4],
-        [2, 8, 7, 4, 1, 9, 6, 3, 5],
-        [3, 4, 5, 2, 8, 6, 1, 7, 9],
-      ];
-      for (int r = 0; r < 9; r++) {
-        for (int c = 0; c < 9; c++) {
-          grid.rows[r][c].value = solvedValues[r][c];
-        }
-      }
-      expect(grid.getHint(), isNull);
-    });
-
     test('autoPopulateNotes should populate candidates for empty grid', () {
       final grid = SudokuGrid.empty();
       grid.autoPopulateNotes();
@@ -252,6 +215,36 @@ void main() {
         for (int r = 0; r < 3; r++) {
           for (int c = 0; c < 3; c++) {
             expect(grid.getCell(r, c).candidates, isNot(contains(5)));
+          }
+        }
+      },
+    );
+
+    test(
+      'updateCandidatesAfterRemoval should add back value to candidates in affected cells',
+      () {
+        final grid = SudokuGrid.empty();
+        // Place 5 at (0,0)
+        grid.setCell(0, 0, 5);
+        grid.updateCandidatesAfterPlacement(0, 0, 5);
+        // Now remove 5 from (0,0)
+        grid.setCell(0, 0, null);
+        grid.updateCandidatesAfterRemoval(0, 0, 5);
+        // Check that 5 is back in candidates for affected cells
+        // Row 0, except (0,0)
+        for (int c = 1; c < 9; c++) {
+          expect(grid.getCell(0, c).candidates, contains(5));
+        }
+        // Column 0, except (0,0)
+        for (int r = 1; r < 9; r++) {
+          expect(grid.getCell(r, 0).candidates, contains(5));
+        }
+        // 3x3 box, except (0,0)
+        for (int r = 0; r < 3; r++) {
+          for (int c = 0; c < 3; c++) {
+            if (r != 0 || c != 0) {
+              expect(grid.getCell(r, c).candidates, contains(5));
+            }
           }
         }
       },

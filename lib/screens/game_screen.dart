@@ -48,31 +48,59 @@ class GameScreen extends StatelessWidget {
               } else {
                 return Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.lightbulb),
-                      onPressed: () {
-                        gameState.getHint();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              gameState.hintedValue != null
-                                  ? 'Hint: Try ${gameState.hintedValue} at row ${gameState.hintedRow! + 1}, col ${gameState.hintedCol! + 1} because it doesn\'t conflict with existing numbers in the same row, column, or 3x3 box.'
-                                  : 'No hint available',
-                            ),
-                          ),
-                        );
-                      },
+                    Tooltip(
+                      message: 'Undo last move',
+                      child: IconButton(
+                        icon: const Icon(Icons.undo),
+                        onPressed: gameState.canUndo
+                            ? () {
+                                gameState.undo();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Move undone!')),
+                                );
+                              }
+                            : null,
+                      ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.note_add),
-                      onPressed: () {
-                        gameState.autoPopulateNotes();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Notes auto-populated!'),
-                          ),
-                        );
-                      },
+                    Tooltip(
+                      message: 'Auto-populate notes',
+                      child: IconButton(
+                        icon: const Icon(Icons.note_add),
+                        onPressed: () {
+                          gameState.autoPopulateNotes();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Notes auto-populated!'),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Tooltip(
+                      message: 'Toggle notes visibility',
+                      child: IconButton(
+                        icon: Icon(
+                          gameState.showCandidates
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          gameState.toggleCandidatesVisibility();
+                        },
+                      ),
+                    ),
+                    Tooltip(
+                      message: 'Toggle cell highlighting',
+                      child: IconButton(
+                        icon: Icon(
+                          gameState.showHighlights
+                              ? Icons.highlight
+                              : Icons.highlight_off,
+                        ),
+                        onPressed: () {
+                          gameState.toggleHighlights();
+                        },
+                      ),
                     ),
                   ],
                 );

@@ -98,5 +98,25 @@ void main() {
       await service.deletePuzzle('to_delete');
       expect(file.existsSync(), isFalse);
     });
+
+    test('loadPuzzle should return null for non-existing file', () async {
+      final loaded = await service.loadPuzzle('non_existing');
+      expect(loaded, isNull);
+    });
+
+    test('loadPuzzle should return null for invalid json', () async {
+      final puzzlesDir = Directory('${tempDir.path}/puzzles');
+      await puzzlesDir.create(recursive: true);
+      final file = File('${puzzlesDir.path}/invalid.json');
+      await file.writeAsString('invalid json');
+
+      final loaded = await service.loadPuzzle('invalid');
+      expect(loaded, isNull);
+    });
+
+    test('deletePuzzle should not throw for non-existing file', () async {
+      // Should not throw
+      await service.deletePuzzle('non_existing');
+    });
   });
 }

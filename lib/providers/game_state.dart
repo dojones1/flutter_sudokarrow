@@ -4,15 +4,24 @@ import '../models/sudoku_grid.dart';
 
 enum InputMode { value, notes }
 
+class Move {
+  final int row;
+  final int col;
+  final int? oldValue;
+  final int? newValue;
+
+  Move(this.row, this.col, this.oldValue, this.newValue);
+}
+
 class GameState extends ChangeNotifier {
   Puzzle? _currentPuzzle;
   int? _selectedRow;
   int? _selectedCol;
   InputMode _inputMode = InputMode.value;
   bool _authorMode = false; // If true, we are setting up the initial puzzle
-  int? _hintedRow;
-  int? _hintedCol;
-  int? _hintedValue;
+  final List<Move> _moves = [];
+  bool _showCandidates = true;
+  bool _showHighlights = true;
 
   Puzzle? get currentPuzzle => _currentPuzzle;
   SudokuGrid? get grid => _currentPuzzle?.grid;
@@ -21,9 +30,9 @@ class GameState extends ChangeNotifier {
   InputMode get inputMode => _inputMode;
   bool get authorMode => _authorMode;
   bool get isSolved => _currentPuzzle?.grid.isSolved() ?? false;
-  int? get hintedRow => _hintedRow;
-  int? get hintedCol => _hintedCol;
-  int? get hintedValue => _hintedValue;
+  bool get canUndo => _moves.isNotEmpty;
+  bool get showCandidates => _showCandidates;
+  bool get showHighlights => _showHighlights;
 
   void startGame(Puzzle puzzle, {bool authorMode = false}) {
     _currentPuzzle = puzzle;
@@ -31,23 +40,7 @@ class GameState extends ChangeNotifier {
     _selectedRow = null;
     _selectedCol = null;
     _inputMode = InputMode.value;
-    _hintedRow = null;
-    _hintedCol = null;
-    _hintedValue = null;
-    notifyListeners();
-  }
-
-  void getHint() {
-    final hint = grid?.getHint();
-    if (hint != null) {
-      _hintedRow = hint['row'];
-      _hintedCol = hint['col'];
-      _hintedValue = hint['value'];
-    } else {
-      _hintedRow = null;
-      _hintedCol = null;
-      _hintedValue = null;
-    }
+    _moves.clear();
     notifyListeners();
   }
 
@@ -56,12 +49,36 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void undo() {
+    if (_moves.isNotEmpty) {
+      final move = _moves.removeLast();
+      final cell = _currentPuzzle!.grid.getCell(move.row, move.col);
+      cell.value = move.oldValue;
+      // If undoing a placement, add back the value to candidates in affected areas
+      if (move.oldValue == null && move.newValue != null) {
+        _currentPuzzle!.grid.updateCandidatesAfterRemoval(
+          move.row,
+          move.col,
+          move.newValue!,
+        );
+      }
+      notifyListeners();
+    }
+  }
+
+  void toggleCandidatesVisibility() {
+    _showCandidates = !_showCandidates;
+    notifyListeners();
+  }
+
+  void toggleHighlights() {
+    _showHighlights = !_showHighlights;
+    notifyListeners();
+  }
+
   void selectCell(int row, int col) {
     _selectedRow = row;
     _selectedCol = col;
-    _hintedRow = null;
-    _hintedCol = null;
-    _hintedValue = null;
     notifyListeners();
   }
 
@@ -96,6 +113,7 @@ class GameState extends ChangeNotifier {
         if (cell.value == number) {
           cell.value = null; // Toggle off
         } else {
+          final oldVal = cell.value;
           cell.value = number;
           cell.candidates.clear(); // Clear candidates when placing value
           // Update candidates in affected areas
@@ -104,6 +122,10 @@ class GameState extends ChangeNotifier {
             _selectedCol!,
             number,
           );
+          // Record move for undo
+          if (oldVal != number) {
+            _moves.add(Move(_selectedRow!, _selectedCol!, oldVal, number));
+          }
         }
       } else {
         // Notes mode
@@ -114,9 +136,6 @@ class GameState extends ChangeNotifier {
         }
       }
     }
-    _hintedRow = null;
-    _hintedCol = null;
-    _hintedValue = null;
     notifyListeners();
   }
 
@@ -138,9 +157,6 @@ class GameState extends ChangeNotifier {
       cell.value = null;
       cell.candidates.clear();
     }
-    _hintedRow = null;
-    _hintedCol = null;
-    _hintedValue = null;
     notifyListeners();
   }
 }
